@@ -3,13 +3,12 @@ import React, { useState, useEffect } from 'react';
 import './CharPicker.css';
 
 const CharPicker = props => {
-  const  [ loadedCharacters, setLoadedCharacters ] = useState([]);
-  const [ isLoading, setIsLoading ] = useState(false);
-  // state = { characters: [], isLoading: false };
+  const [loadedChars, setLoadedChars] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-
-  useEffect( () => {
-    setIsLoading( true );
+  useEffect(() => {
+    console.log('useEffect runs');
+    setIsLoading(true);
     fetch('https://swapi.co/api/people')
       .then(response => {
         if (!response.ok) {
@@ -19,13 +18,14 @@ const CharPicker = props => {
       })
       .then(charData => {
         const selectedCharacters = charData.results.slice(0, 5);
+
         setIsLoading(false);
-        setLoadedCharacters(
+        setLoadedChars(
           selectedCharacters.map((char, index) => ({
             name: char.name,
             id: index + 1
           }))
-         );
+        );
       })
       .catch(err => {
         console.log(err);
@@ -33,33 +33,26 @@ const CharPicker = props => {
       });
   }, []);
 
-    let content = <p>Loading characters...</p>;
+  let content = <p>Loading characters...</p>;
 
-    if (
-      !isLoading &&
-      loadedCharacters &&
-      loadedCharacters.length > 0
-    ) {
-      content = (
-        <select
-          onChange={props.onCharSelect}
-          value={props.selectedChar}
-          className={props.side}
-        >
-          {loadedCharacters.map(char => (
-            <option key={char.id} value={char.id}>
-              {char.name}
-            </option>
-          ))}
-        </select>
-      );
-    } else if (
-      !isLoading &&
-      (!loadedCharacters || loadedCharacters.length === 0)
-    ) {
-      content = <p>Could not fetch any data.</p>;
-    }
-    return content;
-}
+  if (!isLoading && loadedChars && loadedChars.length > 0) {
+    content = (
+      <select
+        onChange={props.onCharSelect}
+        value={props.selectedChar}
+        className={props.side}
+      >
+        {loadedChars.map(char => (
+          <option key={char.id} value={char.id}>
+            {char.name}
+          </option>
+        ))}
+      </select>
+    );
+  } else if (!isLoading && (!loadedChars || loadedChars.length === 0)) {
+    content = <p>Could not fetch any data.</p>;
+  }
+  return content;
+};
 
 export default CharPicker;
